@@ -1,0 +1,5 @@
+{
+  "/api/admin/class-sheet-ids/route": "app/api/admin/class-sheet-ids/route.js",
+  "/page": "app/page.js",
+  "/api/admin/summary/route": "app/api/admin/summary/route.js"
+}
