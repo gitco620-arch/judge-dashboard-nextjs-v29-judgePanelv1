@@ -2,8 +2,9 @@ import { GoogleAuth } from "google-auth-library"
 import { google } from "googleapis"
 import * as fs from "fs"
 import * as path from "path"
+import * as os from "os"
 
-const CLASS_SHEET_IDS_PATH = path.resolve(process.cwd(), "config/class-sheet-ids.json")
+const CLASS_SHEET_IDS_PATH = path.resolve(process.cwd(), "lib/class-sheet-ids.json")
 
 function loadClassSheetIds(): Record<string, string> {
   try {
@@ -61,7 +62,6 @@ interface ClassConfig {
 
 // Configuration for Google Sheets API
 export const GOOGLE_SHEETS_CONFIG = {
-  serviceAccountKeyPath: process.env.GOOGLE_SERVICE_ACCOUNT_KEY_PATH || "./config/service-account-key.json",
   scopes: ["https://www.googleapis.com/auth/spreadsheets"],
 }
 
@@ -69,7 +69,7 @@ export const GOOGLE_SHEETS_CONFIG = {
 const persistedIds = loadClassSheetIds()
 export let SPREADSHEET_CONFIG = {
   CREDENTIALS: {
-    id: process.env.CREDENTIALS_SPREADSHEET_ID || "1snk-FZaxyZbSu_Ww-oPnam8JxZ2RLg3etI5TBkr-T1A", // REPLACE WITH YOUR CREDENTIALS SHEET ID
+    id: process.env.CREDENTIALS_SPREADSHEET_ID || "1juP3Eg24GYgOmFcxpNMfbUSXK4m7xTqzlN-Cw9ndYQc", // REPLACE WITH YOUR CREDENTIALS SHEET ID
     range: "Sheet1!A:C", // Username, Password, Role
   },
   ADMIN_MASTER: {
@@ -129,22 +129,29 @@ export class GoogleSheetsService {
   private sheets: any
 
   constructor() {
-    // Handle both file path and base64 encoded key for deployment
-    if (process.env.GOOGLE_SERVICE_ACCOUNT_KEY_BASE64) {
-      const keyData = Buffer.from(process.env.GOOGLE_SERVICE_ACCOUNT_KEY_BASE64, "base64").toString("utf8")
-      const keyPath = "/tmp/service-account-key.json" // Vercel /tmp directory is writable
-      fs.writeFileSync(keyPath, keyData)
+    try {
+      const base64Key = process.env.GOOGLE_SERVICE_ACCOUNT_KEY_BASE64;
+      if (!base64Key) {
+        throw new Error(
+          "GOOGLE_SERVICE_ACCOUNT_KEY_BASE64 environment variable is not set. Please configure your service account key as a Base64 encoded string."
+        );
+      }
+      // Decode and write to a temp file in the OS temp directory
+      const keyData = Buffer.from(base64Key, "base64").toString("utf8");
+      const tmpDir = os.tmpdir();
+      const keyPath = path.join(tmpDir, "service-account-key.json");
+      fs.writeFileSync(keyPath, keyData);
+
       this.auth = new GoogleAuth({
         keyFile: keyPath,
         scopes: GOOGLE_SHEETS_CONFIG.scopes,
-      })
-    } else {
-      this.auth = new GoogleAuth({
-        keyFile: GOOGLE_SHEETS_CONFIG.serviceAccountKeyPath,
-        scopes: GOOGLE_SHEETS_CONFIG.scopes,
-      })
+      });
+      this.sheets = google.sheets({ version: "v4", auth: this.auth });
+      console.log("🔗 Google Sheets API initialized with service account key from Base64.");
+    } catch (err) {
+      console.error("❌ Error initializing Google Sheets API:", err);
+      throw err;
     }
-    this.sheets = google.sheets({ version: "v4", auth: this.auth })
   }
 
   async getSheetData(spreadsheetId: string, range: string): Promise<SheetData> {

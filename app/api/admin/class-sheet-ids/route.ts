@@ -3,7 +3,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 export async function GET() {
-  const filePath = path.resolve(process.cwd(), "config/class-sheet-ids.json");
+  const filePath = path.resolve(process.cwd(), "lib/class-sheet-ids.json");
   try {
     const raw = fs.readFileSync(filePath, "utf-8");
     const ids = JSON.parse(raw);

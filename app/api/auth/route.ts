@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { GoogleSheetsService } from "@/lib/google-sheets"
 
 export async function POST(request: Request) {
+  console.log("API /api/auth called");
   try {
     const { username, password } = await request.json()
 

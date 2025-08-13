@@ -1,5 +1,8 @@
 {
-  "/api/admin/class-sheet-ids/route": "app/api/admin/class-sheet-ids/route.js",
   "/page": "app/page.js",
+  "/admin-dashboard/page": "app/admin-dashboard/page.js",
+  "/judge-panel/page": "app/judge-panel/page.js",
+  "/judge-dashboard/page": "app/judge-dashboard/page.js",
+  "/api/admin/class-sheet-ids/route": "app/api/admin/class-sheet-ids/route.js",
   "/api/admin/summary/route": "app/api/admin/summary/route.js"
 }
