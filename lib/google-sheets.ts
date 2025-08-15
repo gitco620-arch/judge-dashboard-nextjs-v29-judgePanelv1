@@ -683,6 +683,7 @@ export class GoogleSheetsService {
         avgTechnicalSkills = projectData.technicalSkillsSum / projectData.judgeCount
         avgPresentation = projectData.presentationSum / projectData.judgeCount
         projectAvgScore = (avgCreativity + avgScientificThought + avgTechnicalSkills + avgPresentation) / 4
+        console.log("jaguuu",judgeSheetNames,avgCreativity, avgScientificThought, avgTechnicalSkills, avgPresentation, projectAvgScore)
       } else if (projectData.absentCount > 0 && projectData.judgeCount === 0) {
         // All judges marked project absent, so all scores are 0
         avgCreativity = 0
@@ -944,3 +945,14 @@ export class GoogleSheetsService {
 
 // Export singleton instance
 export const googleSheetsService = new GoogleSheetsService()
+
+const sheetTitlesCache: { [spreadsheetId: string]: string[] } = {};
+
+async function getAllSheetTitlesCached(spreadsheetId: string): Promise<string[]> {
+  if (sheetTitlesCache[spreadsheetId]) {
+    return sheetTitlesCache[spreadsheetId];
+  }
+  const titles = await googleSheetsService.getAllSheetTitles(spreadsheetId);
+  sheetTitlesCache[spreadsheetId] = titles;
+  return titles;
+}
