@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Loader2, ArrowLeft, FileSpreadsheet, RefreshCw, ExternalLink, Database, Clock } from 'lucide-react'
+import { Loader2, ArrowLeft, FileSpreadsheet, RefreshCw, Database, Clock } from "lucide-react"
 
 interface JudgeScore {
   sno: string
@@ -124,9 +124,7 @@ export default function JudgeScoresPage() {
     const csvContent = [
       headers.join(","),
       ...rows.map((row) =>
-        row
-          .map((field) => (typeof field === "string" && field.includes(",") ? `"${field}"` : field))
-          .join(","),
+        row.map((field) => (typeof field === "string" && field.includes(",") ? `"${field}"` : field)).join(","),
       ),
     ].join("\n")
 
@@ -145,7 +143,7 @@ export default function JudgeScoresPage() {
 
   if (initialLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50">
         <div className="text-center">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
           <p className="text-gray-600">Loading your scores...</p>
@@ -159,23 +157,33 @@ export default function JudgeScoresPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-white shadow-lg border-b-4 border-[#F5BD3A]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-20">
             <div className="flex items-center">
-              <Button variant="ghost" onClick={() => router.push("/judge-dashboard")} className="mr-4">
+              <Button
+                variant="ghost"
+                onClick={() => router.push("/judge-dashboard")}
+                className="mr-4 text-[#9B5A44] hover:bg-[#9B5A44] hover:text-white"
+              >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Dashboard
               </Button>
               <div>
-                <h1 className="text-xl font-semibold text-gray-900">My Submitted Scores</h1>
-                <p className="text-sm text-gray-600">Viewing scores for Judge: {user.username}</p>
+                <h1 className="text-xl font-semibold text-[#9B5A44]">My Submitted Scores</h1>
+                <p className="text-sm text-[#D99058] font-medium">AURA V - The Way to Shine in KREA</p>
+                <p className="text-xs text-[#9B5A44]/70">Viewing scores for Judge: {user.username}</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <Button variant="outline" onClick={exportToCsv} disabled={scores.length === 0}>
+              <Button
+                variant="outline"
+                onClick={exportToCsv}
+                disabled={scores.length === 0}
+                className="border-[#9B5A44] text-[#9B5A44] hover:bg-[#9B5A44] hover:text-white bg-transparent"
+              >
                 <FileSpreadsheet className="mr-2 h-4 w-4" />
                 Export to CSV
               </Button>
@@ -188,13 +196,15 @@ export default function JudgeScoresPage() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-6">
           {/* Class Selection */}
-          <Card>
-            <CardHeader>
+          <Card className="shadow-lg border-2 border-[#9B5A44]/20">
+            <CardHeader className="bg-gradient-to-r from-[#9B5A44] to-[#D99058] text-white rounded-t-lg">
               <CardTitle className="flex items-center">
                 <Database className="mr-2 h-5 w-5" />
                 Select Class to View Scores
               </CardTitle>
-              <CardDescription>Choose a class to see all scores you have submitted for it.</CardDescription>
+              <CardDescription className="text-amber-100">
+                Choose a class to see all scores you have submitted for it.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -220,7 +230,7 @@ export default function JudgeScoresPage() {
                       variant="outline"
                       onClick={handleRefresh}
                       disabled={loading}
-                      className="w-full bg-transparent"
+                      className="w-full border-[#9B5A44] text-[#9B5A44] hover:bg-[#9B5A44] hover:text-white bg-transparent"
                     >
                       <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
                       Refresh Scores
@@ -240,15 +250,15 @@ export default function JudgeScoresPage() {
 
           {/* Scores Display */}
           {selectedClass && (
-            <Card>
-              <CardHeader>
+            <Card className="shadow-lg border-2 border-[#9B5A44]/20">
+              <CardHeader className="bg-gradient-to-r from-[#9B5A44] to-[#D99058] text-white rounded-t-lg">
                 <div className="flex items-center justify-between">
                   <div>
                     <CardTitle className="flex items-center">
                       <FileSpreadsheet className="mr-2 h-5 w-5" />
                       Your Scores for {selectedClass}
                     </CardTitle>
-                    <CardDescription className="flex items-center mt-1">
+                    <CardDescription className="flex items-center mt-1 text-amber-100">
                       {loading ? (
                         <>
                           <Loader2 className="mr-1 h-3 w-3 animate-spin" />
@@ -306,7 +316,10 @@ export default function JudgeScoresPage() {
                             <TableCell>{score.technicalSkills !== null ? score.technicalSkills : "-"}</TableCell>
                             <TableCell>{score.presentation !== null ? score.presentation : "-"}</TableCell>
                             <TableCell>
-                              <Badge variant="outline" className={score.status === "Absent" ? "text-red-600" : "text-green-600"}>
+                              <Badge
+                                variant="outline"
+                                className={score.status === "Absent" ? "text-red-600" : "text-green-600"}
+                              >
                                 {score.status}
                               </Badge>
                             </TableCell>
@@ -328,7 +341,7 @@ export default function JudgeScoresPage() {
           )}
 
           {!selectedClass && (
-            <Card>
+            <Card className="shadow-lg border-2 border-[#9B5A44]/20">
               <CardContent className="text-center py-16">
                 <div className="text-gray-500">
                   <FileSpreadsheet className="h-20 w-20 mx-auto mb-6 text-gray-300" />

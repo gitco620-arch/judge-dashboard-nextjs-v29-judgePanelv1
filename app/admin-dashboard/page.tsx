@@ -114,7 +114,7 @@ export default function AdminDashboard() {
         setSheets([
           {
             name: "Login Credentials",
-            id: "1juP3Eg24GYgOmFcxpNMfbUSXK4m7xTqzlN-Cw9ndYQc",
+            id: "1snk-FZaxyZbSu_Ww-oPnam8JxZ2RLg3etI5TBkr-T1A",
             status: "Connected",
             lastAccessed: "2024-01-15 10:30 AM",
           },
@@ -246,10 +246,10 @@ export default function AdminDashboard() {
 
   if (initialLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-purple-600" />
-          <p className="text-gray-600">Loading admin dashboard...</p>
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#9B5A44]" />
+          <p className="text-[#9B5A44]">Loading admin dashboard...</p>
         </div>
       </div>
     )
@@ -260,24 +260,34 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-white shadow-lg border-b-4 border-[#F5BD3A]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-20">
             <div className="flex items-center">
-              <Settings className="h-6 w-6 text-purple-600 mr-3" />
+              <Settings className="h-6 w-6 text-[#9B5A44] mr-3" />
               <div>
-                <h1 className="text-xl font-semibold text-gray-900">Admin Dashboard</h1>
-                <p className="text-sm text-gray-600">Welcome, Admin {user.username}</p>
+                <h1 className="text-2xl font-bold text-[#9B5A44]">Admin Dashboard</h1>
+                <p className="text-sm text-[#D99058] font-medium">AURA V - The Way to Shine in KREA</p>
+                <p className="text-xs text-[#9B5A44]/70">Welcome, Admin {user.username}</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <Button variant="outline" onClick={handleRefreshData} disabled={loading}>
+              <Button
+                variant="outline"
+                onClick={handleRefreshData}
+                disabled={loading}
+                className="border-[#9B5A44] text-[#9B5A44] hover:bg-[#9B5A44] hover:text-white bg-transparent"
+              >
                 <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
                 Refresh
               </Button>
-              <Button variant="outline" onClick={handleLogout}>
+              <Button
+                variant="outline"
+                onClick={handleLogout}
+                className="border-[#9B5A44] text-[#9B5A44] hover:bg-[#9B5A44] hover:text-white bg-transparent"
+              >
                 <LogOut className="mr-2 h-4 w-4" />
                 Logout
               </Button>
@@ -305,9 +315,9 @@ export default function AdminDashboard() {
           )}
 
           {/* Stats Cards */}
-          {/* {stats && (
+          {stats && (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              <Card className="shadow-sm">
+              <Card className="shadow-lg border-2 border-[#9B5A44]/20">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Total Users</CardTitle>
                   <Users className="h-4 w-4 text-muted-foreground" />
@@ -320,7 +330,7 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
 
-              <Card className="shadow-sm">
+              <Card className="shadow-lg border-2 border-[#9B5A44]/20">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Connected Sheets</CardTitle>
                   <FileSpreadsheet className="h-4 w-4 text-muted-foreground" />
@@ -331,7 +341,7 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
 
-              <Card className="shadow-sm">
+              <Card className="shadow-lg border-2 border-[#9B5A44]/20">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">System Status</CardTitle>
                   <Activity className="h-4 w-4 text-muted-foreground" />
@@ -342,7 +352,7 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
 
-              <Card className="shadow-sm">
+              <Card className="shadow-lg border-2 border-[#9B5A44]/20">
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Last Sync</CardTitle>
                   <Database className="h-4 w-4 text-muted-foreground" />
@@ -353,55 +363,64 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
             </div>
-          )} */}
+          )}
 
           {/* Admin Features */}
-          <Card className="shadow-sm">
+          <Card className="shadow-lg border-2 border-[#9B5A44]/20">
             <CardHeader>
               <CardTitle>Admin Actions</CardTitle>
               <CardDescription>Perform key administrative tasks for the science fair.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <Button
                   variant="outline"
-                  className="h-24 flex-col items-center justify-center text-lg bg-white hover:bg-gray-50"
+                  className="h-24 flex-col items-center justify-center text-lg bg-white hover:bg-[#9B5A44] hover:text-white border-[#9B5A44]/20"
                 >
-                  <Users className="h-8 w-8 mb-2 text-gray-600" />
+                  <Users className="h-8 w-8 mb-2 text-[#9B5A44]" />
                   User Management
                 </Button>
                 <Button
                   variant="outline"
-                  className="h-24 flex-col items-center justify-center text-lg bg-white hover:bg-gray-50"
+                  className="h-24 flex-col items-center justify-center text-lg bg-white hover:bg-[#9B5A44] hover:text-white border-[#9B5A44]/20"
                   onClick={handleProcessAllScores}
                   disabled={processingScores}
                 >
                   {processingScores ? (
                     <>
-                      <Loader2 className="h-8 w-8 animate-spin mb-2 text-purple-600" />
-                      <span className="text-purple-600">Processing Scores...</span>
+                      <Loader2 className="h-8 w-8 animate-spin mb-2 text-[#9B5A44]" />
+                      <span className="text-[#9B5A44]">Processing Scores...</span>
                     </>
                   ) : (
                     <>
-                      <ListChecks className="h-8 w-8 mb-2 text-green-600" />
+                      <ListChecks className="h-8 w-8 mb-2 text-[#9B5A44]" />
                       Process All Scores
                     </>
                   )}
+                </Button>
+                <Button
+                  variant="outline"
+                  className="h-24 flex-col items-center justify-center text-lg bg-white hover:bg-[#9B5A44] hover:text-white border-[#9B5A44]/20"
+                >
+                  <BarChart2 className="h-8 w-8 mb-2 text-blue-600" />
+                  View Analytics
                 </Button>
               </div>
             </CardContent>
           </Card>
 
           {/* Top Projects Summary */}
-          <Card className="shadow-sm">
-            <CardHeader>
+          <Card className="shadow-lg border-2 border-[#9B5A44]/20">
+            <CardHeader className="bg-gradient-to-r from-[#9B5A44] to-[#D99058] text-white rounded-t-lg">
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="flex items-center">
-                    <Trophy className="mr-2 h-5 w-5 text-yellow-600" />
+                    <Trophy className="mr-2 h-5 w-5 text-white" />
                     Top Projects Summary
                   </CardTitle>
-                  <CardDescription>Ranked projects based on average judge scores across all criteria.</CardDescription>
+                  <CardDescription className="text-amber-100">
+                    Ranked projects based on average judge scores across all criteria.
+                  </CardDescription>
                 </div>
                 <Button
                   variant="outline"
@@ -409,10 +428,11 @@ export default function AdminDashboard() {
                   onClick={() =>
                     // Assuming ADMIN_MASTER_SPREADSHEET_ID is available in SPREADSHEET_CONFIG
                     window.open(
-                      `https://docs.google.com/spreadsheets/d/1ArCE7fS1MKqaco4K8eNiL7X27OCZ5pHqZyZiGXDUhGE`,
+                      `https://docs.google.com/spreadsheets/d/${process.env.ADMIN_MASTER_SPREADSHEET_ID}`,
                       "_blank",
                     )
                   }
+                  className="border-[#9B5A44] text-[#9B5A44] hover:bg-[#9B5A44] hover:text-white"
                 >
                   <ExternalLink className="mr-2 h-4 w-4" />
                   Open Master Sheet
@@ -422,7 +442,7 @@ export default function AdminDashboard() {
             <CardContent>
               {loading ? (
                 <div className="flex items-center justify-center py-8">
-                  <Loader2 className="h-6 w-6 animate-spin mr-2 text-purple-600" />
+                  <Loader2 className="h-6 w-6 animate-spin mr-2 text-[#9B5A44]" />
                   <span>Loading top projects...</span>
                 </div>
               ) : topProjectsSummary.length > 0 ? (
@@ -472,24 +492,30 @@ export default function AdminDashboard() {
 
           {/* Tabs */}
           <Tabs defaultValue="sheets" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="users">User Management</TabsTrigger>
               <TabsTrigger value="sheets">Google Sheets</TabsTrigger>
-              {/* <TabsTrigger value="settings">System Settings</TabsTrigger> */}
+              <TabsTrigger value="settings">System Settings</TabsTrigger>
             </TabsList>
 
             <TabsContent value="users" className="space-y-4">
-              <Card className="shadow-sm">
-                <CardHeader>
+              <Card className="shadow-lg border-2 border-[#9B5A44]/20">
+                <CardHeader className="bg-gradient-to-r from-[#9B5A44] to-[#D99058] text-white rounded-t-lg">
                   <div className="flex items-center justify-between">
                     <div>
                       <CardTitle className="flex items-center">
-                        <Users className="mr-2 h-5 w-5" />
+                        <Users className="mr-2 h-5 w-5 text-white" />
                         User Accounts
                       </CardTitle>
-                      <CardDescription>Manage user accounts and their access levels.</CardDescription>
+                      <CardDescription className="text-amber-100">
+                        Manage user accounts and their access levels.
+                      </CardDescription>
                     </div>
-                    <Button variant="outline" size="sm">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="border-[#9B5A44] text-[#9B5A44] hover:bg-[#9B5A44] hover:text-white bg-transparent"
+                    >
                       <PlusCircle className="mr-2 h-4 w-4" />
                       Add User
                     </Button>
@@ -498,7 +524,7 @@ export default function AdminDashboard() {
                 <CardContent>
                   {loading ? (
                     <div className="flex items-center justify-center py-8">
-                      <Loader2 className="h-6 w-6 animate-spin mr-2 text-purple-600" />
+                      <Loader2 className="h-6 w-6 animate-spin mr-2 text-[#9B5A44]" />
                       <span>Loading users...</span>
                     </div>
                   ) : (
@@ -545,17 +571,24 @@ export default function AdminDashboard() {
             </TabsContent>
 
             <TabsContent value="sheets" className="space-y-4">
-              <Card className="shadow-sm">
-                <CardHeader>
+              <Card className="shadow-lg border-2 border-[#9B5A44]/20">
+                <CardHeader className="bg-gradient-to-r from-[#9B5A44] to-[#D99058] text-white rounded-t-lg">
                   <div className="flex items-center justify-between">
                     <div>
                       <CardTitle className="flex items-center">
-                        <Database className="mr-2 h-5 w-5" />
+                        <Database className="mr-2 h-5 w-5 text-white" />
                         Google Sheets Configuration
                       </CardTitle>
-                      <CardDescription>Manage connected Google Sheets and their configurations.</CardDescription>
+                      <CardDescription className="text-amber-100">
+                        Manage connected Google Sheets and their configurations.
+                      </CardDescription>
                     </div>
-                    <Button variant="outline" size="sm" onClick={() => setIsAddSheetDialogOpen(true)}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsAddSheetDialogOpen(true)}
+                      className="border-[#9B5A44] text-[#9B5A44] hover:bg-[#9B5A44] hover:text-white"
+                    >
                       <PlusCircle className="mr-2 h-4 w-4" />
                       Add Sheet
                     </Button>
@@ -564,7 +597,7 @@ export default function AdminDashboard() {
                 <CardContent>
                   {loading ? (
                     <div className="flex items-center justify-center py-8">
-                      <Loader2 className="h-6 w-6 animate-spin mr-2 text-purple-600" />
+                      <Loader2 className="h-6 w-6 animate-spin mr-2 text-[#9B5A44]" />
                       <span>Loading sheets...</span>
                     </div>
                   ) : (
@@ -575,7 +608,7 @@ export default function AdminDashboard() {
                             <TableHead>Sheet Name</TableHead>
                             <TableHead>Spreadsheet ID</TableHead>
                             <TableHead>Status</TableHead>
-                            {/* <TableHead>Last Accessed</TableHead> */}
+                            <TableHead>Last Accessed</TableHead>
                             <TableHead className="text-right">Actions</TableHead>
                           </TableRow>
                         </TableHeader>
@@ -589,7 +622,7 @@ export default function AdminDashboard() {
                                   {sheet.status}
                                 </Badge>
                               </TableCell>
-                              {/* <TableCell className="text-sm">{sheet.lastAccessed}</TableCell> */}
+                              <TableCell className="text-sm">{sheet.lastAccessed}</TableCell>
                               <TableCell className="text-right">
                                 <div className="flex items-center justify-end space-x-2">
                                   <Button
@@ -598,6 +631,7 @@ export default function AdminDashboard() {
                                     onClick={() =>
                                       window.open(`https://docs.google.com/spreadsheets/d/${sheet.id}`, "_blank")
                                     }
+                                    className="border-[#9B5A44] text-[#9B5A44] hover:bg-[#9B5A44] hover:text-white"
                                   >
                                     <ExternalLink className="h-4 w-4" />
                                   </Button>
@@ -605,6 +639,7 @@ export default function AdminDashboard() {
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => handleConfigureSheetClick(sheet.name, sheet.id)}
+                                    className="border-[#9B5A44] text-[#9B5A44] hover:bg-[#9B5A44] hover:text-white"
                                   >
                                     Configure
                                   </Button>
@@ -622,13 +657,15 @@ export default function AdminDashboard() {
 
             <TabsContent value="settings" className="space-y-4">
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                <Card className="shadow-sm">
-                  <CardHeader>
+                <Card className="shadow-lg border-2 border-[#9B5A44]/20">
+                  <CardHeader className="bg-gradient-to-r from-[#9B5A44] to-[#D99058] text-white rounded-t-lg">
                     <CardTitle className="flex items-center">
-                      <Database className="mr-2 h-5 w-5" />
+                      <Database className="mr-2 h-5 w-5 text-white" />
                       Google Sheets API
                     </CardTitle>
-                    <CardDescription>Configure API settings and credentials.</CardDescription>
+                    <CardDescription className="text-amber-100">
+                      Configure API settings and credentials.
+                    </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-center justify-between">
@@ -647,19 +684,23 @@ export default function AdminDashboard() {
                       </div>
                       <span className="text-sm">85% used</span>
                     </div>
-                    <Button variant="outline" size="sm" className="w-full bg-white hover:bg-gray-50">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full bg-white hover:bg-[#9B5A44] hover:text-white border-[#9B5A44]/20"
+                    >
                       Configure API Settings
                     </Button>
                   </CardContent>
                 </Card>
 
-                <Card className="shadow-sm">
-                  <CardHeader>
+                <Card className="shadow-lg border-2 border-[#9B5A44]/20">
+                  <CardHeader className="bg-gradient-to-r from-[#9B5A44] to-[#D99058] text-white rounded-t-lg">
                     <CardTitle className="flex items-center">
-                      <Shield className="mr-2 h-5 w-5" />
+                      <Shield className="mr-2 h-5 w-5 text-white" />
                       Security Settings
                     </CardTitle>
-                    <CardDescription>Manage security and access controls.</CardDescription>
+                    <CardDescription className="text-amber-100">Manage security and access controls.</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-center justify-between">
@@ -676,19 +717,23 @@ export default function AdminDashboard() {
                       </div>
                       <Badge variant="outline">Disabled</Badge>
                     </div>
-                    <Button variant="outline" size="sm" className="w-full bg-white hover:bg-gray-50">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full bg-white hover:bg-[#9B5A44] hover:text-white border-[#9B5A44]/20"
+                    >
                       Configure Security
                     </Button>
                   </CardContent>
                 </Card>
 
-                <Card className="shadow-sm">
-                  <CardHeader>
+                <Card className="shadow-lg border-2 border-[#9B5A44]/20">
+                  <CardHeader className="bg-gradient-to-r from-[#9B5A44] to-[#D99058] text-white rounded-t-lg">
                     <CardTitle className="flex items-center">
-                      <Activity className="mr-2 h-5 w-5" />
+                      <Activity className="mr-2 h-5 w-5 text-white" />
                       System Monitoring
                     </CardTitle>
-                    <CardDescription>Monitor system performance and health.</CardDescription>
+                    <CardDescription className="text-amber-100">Monitor system performance and health.</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-center justify-between">
@@ -705,19 +750,23 @@ export default function AdminDashboard() {
                       </div>
                       <span className="text-sm">245ms</span>
                     </div>
-                    <Button variant="outline" size="sm" className="w-full bg-white hover:bg-gray-50">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full bg-white hover:bg-[#9B5A44] hover:text-white border-[#9B5A44]/20"
+                    >
                       View Detailed Metrics
                     </Button>
                   </CardContent>
                 </Card>
 
-                <Card className="shadow-sm">
-                  <CardHeader>
+                <Card className="shadow-lg border-2 border-[#9B5A44]/20">
+                  <CardHeader className="bg-gradient-to-r from-[#9B5A44] to-[#D99058] text-white rounded-t-lg">
                     <CardTitle className="flex items-center">
-                      <FileSpreadsheet className="mr-2 h-5 w-5" />
+                      <FileSpreadsheet className="mr-2 h-5 w-5 text-white" />
                       Data Management
                     </CardTitle>
-                    <CardDescription>Backup and export options.</CardDescription>
+                    <CardDescription className="text-amber-100">Backup and export options.</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-center justify-between">
@@ -734,7 +783,11 @@ export default function AdminDashboard() {
                       </div>
                       <span className="text-sm">CSV, JSON</span>
                     </div>
-                    <Button variant="outline" size="sm" className="w-full bg-white hover:bg-gray-50">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full bg-white hover:bg-[#9B5A44] hover:text-white border-[#9B5A44]/20"
+                    >
                       Configure Backups
                     </Button>
                   </CardContent>
