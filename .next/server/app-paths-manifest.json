@@ -1,10 +1,13 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
   "/page": "app/page.js",
   "/judge-dashboard/page": "app/judge-dashboard/page.js",
   "/judge-panel/page": "app/judge-panel/page.js",
-  "/admin-dashboard/page": "app/admin-dashboard/page.js",
+  "/api/judge-scores/route": "app/api/judge-scores/route.js",
+  "/api/students/route": "app/api/students/route.js",
+  "/api/projects/route": "app/api/projects/route.js",
   "/api/auth/route": "app/api/auth/route.js",
+  "/admin-dashboard/page": "app/admin-dashboard/page.js",
   "/api/admin/class-sheet-ids/route": "app/api/admin/class-sheet-ids/route.js",
-  "/api/admin/summary/route": "app/api/admin/summary/route.js"
+  "/api/admin/summary/route": "app/api/admin/summary/route.js",
+  "/api/admin/process-scores/route": "app/api/admin/process-scores/route.js"
 }

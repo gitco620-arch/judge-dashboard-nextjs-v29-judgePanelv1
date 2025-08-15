@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Loader2, ArrowLeft, Save, Star, Users, CheckCircle } from "lucide-react"
+import Image from "next/image"
 
 interface StudentProject {
   sno: string
@@ -19,7 +20,7 @@ interface StudentProject {
   grade: string
   projectTitle: string
   projectId: string
-  theme?: string // Added theme field
+  theme?: string
 }
 
 interface JudgeScore {
@@ -32,21 +33,33 @@ interface JudgeScore {
   scientificThought: number | null
   technicalSkills: number | null
   presentation: number | null
-  status?: string // Added status field (e.g., "Present", "Absent")
-  themeFit?: string // Added themeFit field
+  status?: string
+  themeFit?: string
+}
+
+interface ProjectScores {
+  creativity: number | null
+  scientificThought: number | null
+  technicalSkills: number | null
+  presentation: number | null
+  themeFit: string | null
+}
+
+interface StudentStatus {
+  [studentName: string]: string // "Present" or "Absent"
 }
 
 export default function JudgePanel() {
   const [user, setUser] = useState<any>(null)
   const [students, setStudents] = useState<StudentProject[]>([])
-  const [projectCriteriaScores, setProjectCriteriaScores] = useState<{
-    creativity: number | null
-    scientificThought: number | null
-    technicalSkills: number | null
-    presentation: number | null
-    status: string
-    themeFit: string | null
-  } | null>(null)
+  const [projectScores, setProjectScores] = useState<ProjectScores>({
+    creativity: null,
+    scientificThought: null,
+    technicalSkills: null,
+    presentation: null,
+    themeFit: null,
+  })
+  const [studentStatuses, setStudentStatuses] = useState<StudentStatus>({})
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [initialLoading, setInitialLoading] = useState(true)
@@ -61,13 +74,13 @@ export default function JudgePanel() {
   const [allProjects, setAllProjects] = useState<string[]>([])
   const [currentProjectIndex, setCurrentProjectIndex] = useState(0)
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
-  const [scoresSaved, setScoresSaved] = useState(false) // New state to track if scores are saved for this project
-  const [projectTheme, setProjectTheme] = useState("") // New state for project theme
+  const [scoresSaved, setScoresSaved] = useState(false)
+  const [projectTheme, setProjectTheme] = useState("")
 
   const loadStudentsAndScores = useCallback(async () => {
     setLoading(true)
     setError("")
-    setHasUnsavedChanges(false) // Reset unsaved changes on new project load
+    setHasUnsavedChanges(false)
 
     try {
       // Load students for this project
@@ -79,10 +92,16 @@ export default function JudgePanel() {
       if (studentsData.success) {
         setStudents(studentsData.students)
         if (studentsData.students.length > 0) {
-          setProjectTheme(studentsData.students[0].theme || "") // Set project theme from the first student
+          setProjectTheme(studentsData.students[0].theme || "")
         } else {
           setProjectTheme("")
         }
+
+        // Initialize student statuses
+        const initialStatuses: StudentStatus = {}
+        studentsData.students.forEach((student: StudentProject) => {
+          initialStatuses[student.studentName] = "Present"
+        })
 
         // Load existing scores if any
         const scoresResponse = await fetch(
@@ -91,29 +110,29 @@ export default function JudgePanel() {
         const scoresData = await scoresResponse.json()
 
         if (scoresData.success && scoresData.scores.length > 0) {
-          // Assuming project-level scores, take the first one to populate the form
-          const existingScore = scoresData.scores[0]
-          setProjectCriteriaScores({
-            creativity: existingScore.creativity,
-            scientificThought: existingScore.scientificThought,
-            technicalSkills: existingScore.technicalSkills,
-            presentation: existingScore.presentation,
-            status: existingScore.status || "Present",
-            themeFit: existingScore.themeFit || null,
+          // Use the first score entry to populate project scores and all student statuses
+          const firstScore = scoresData.scores[0]
+          setProjectScores({
+            creativity: firstScore.creativity,
+            scientificThought: firstScore.scientificThought,
+            technicalSkills: firstScore.technicalSkills,
+            presentation: firstScore.presentation,
+            themeFit: firstScore.themeFit || null,
           })
-          setScoresSaved(true) // Mark as saved if scores exist for this project
+
+          // Update student statuses from existing scores
+          scoresData.scores.forEach((score: JudgeScore) => {
+            if (initialStatuses[score.studentName] !== undefined) {
+              initialStatuses[score.studentName] = score.status || "Present"
+            }
+          })
+
+          setScoresSaved(true)
         } else {
-          // Initialize empty scores for the project if no existing scores
-          setProjectCriteriaScores({
-            creativity: null,
-            scientificThought: null,
-            technicalSkills: null,
-            presentation: null,
-            status: "Present", // Default status to Present
-            themeFit: null,
-          })
-          setScoresSaved(false) // Mark as not saved for new scoring
+          setScoresSaved(false)
         }
+
+        setStudentStatuses(initialStatuses)
       } else {
         setError(studentsData.error || "Failed to load students")
       }
@@ -163,42 +182,30 @@ export default function JudgePanel() {
   }, [className, projectId])
 
   const handleScoreChange = (criterion: string, value: string) => {
-    if (scoresSaved || projectCriteriaScores?.status === "Absent") return
+    if (scoresSaved) return
 
     const numValue = value === "" ? null : Number.parseFloat(value)
-    setProjectCriteriaScores((prev) => ({
-      ...prev!,
+    setProjectScores((prev) => ({
+      ...prev,
       [criterion]: numValue,
     }))
     setHasUnsavedChanges(true)
   }
 
-  const handleStatusChange = (newStatus: string) => {
-    if (scoresSaved) return // Prevent changes if scores are already saved
+  const handleStatusChange = (studentName: string, newStatus: string) => {
+    if (scoresSaved) return
 
-    setProjectCriteriaScores((prev) => {
-      const updatedScores = { ...prev!, status: newStatus }
-      if (newStatus === "Absent") {
-        updatedScores.creativity = 0
-        updatedScores.scientificThought = 0
-        updatedScores.technicalSkills = 0
-        updatedScores.presentation = 0
-      } else {
-        // When changing from Absent to Present, clear scores to null for re-entry
-        updatedScores.creativity = null
-        updatedScores.scientificThought = null
-        updatedScores.technicalSkills = null
-        updatedScores.presentation = null
-      }
-      return updatedScores
-    })
+    setStudentStatuses((prev) => ({
+      ...prev,
+      [studentName]: newStatus,
+    }))
     setHasUnsavedChanges(true)
   }
 
   const handleThemeFitChange = (value: string) => {
     if (scoresSaved) return
-    setProjectCriteriaScores((prev) => ({
-      ...prev!,
+    setProjectScores((prev) => ({
+      ...prev,
       themeFit: value,
     }))
     setHasUnsavedChanges(true)
@@ -221,19 +228,19 @@ export default function JudgePanel() {
     setSuccess("")
 
     try {
-      // Construct scoresArray by applying project-level scores to each student
+      // Construct scoresArray - each student gets the same project scores but their individual status
       const scoresArray: JudgeScore[] = students.map((student) => ({
         sno: student.sno,
         studentName: student.studentName,
         grade: student.grade,
         projectTitle: student.projectTitle,
         projectId: student.projectId,
-        creativity: projectCriteriaScores?.creativity || null,
-        scientificThought: projectCriteriaScores?.scientificThought || null,
-        technicalSkills: projectCriteriaScores?.technicalSkills || null,
-        presentation: projectCriteriaScores?.presentation || null,
-        status: projectCriteriaScores?.status || "Present",
-        themeFit: projectCriteriaScores?.themeFit || undefined,
+        creativity: projectScores.creativity,
+        scientificThought: projectScores.scientificThought,
+        technicalSkills: projectScores.technicalSkills,
+        presentation: projectScores.presentation,
+        status: studentStatuses[student.studentName] || "Present",
+        themeFit: projectScores.themeFit || undefined,
       }))
 
       const response = await fetch("/api/judge-scores", {
@@ -245,7 +252,7 @@ export default function JudgePanel() {
           class: className,
           judge: user.username,
           scores: scoresArray,
-          append: true, // Flag to indicate append mode
+          append: true,
         }),
       })
 
@@ -254,8 +261,8 @@ export default function JudgePanel() {
       if (data.success) {
         setSuccess(`Scores saved permanently to Judge_${user.username} sheet! Total rows: ${data.totalRows || "N/A"}`)
         setHasUnsavedChanges(false)
-        setScoresSaved(true) // Mark as saved after successful submission
-        setTimeout(() => setSuccess(""), 5000) // Clear success message after 5 seconds
+        setScoresSaved(true)
+        setTimeout(() => setSuccess(""), 5000)
       } else {
         setError(data.error || "Failed to save scores")
       }
@@ -267,19 +274,15 @@ export default function JudgePanel() {
   }
 
   const isFormValid = () => {
-    if (!projectCriteriaScores) return false
-    if (!projectCriteriaScores.themeFit) return false // Theme Fit is required
+    // Check if theme fit is selected
+    if (!projectScores.themeFit) return false
 
-    if (projectCriteriaScores.status === "Absent") {
-      return true // If absent, scores are auto-zeroed, so it's valid
-    }
-
-    // If present, all 4 criteria must be filled
+    // Check if all 4 project criteria are filled
     return (
-      projectCriteriaScores.creativity !== null &&
-      projectCriteriaScores.scientificThought !== null &&
-      projectCriteriaScores.technicalSkills !== null &&
-      projectCriteriaScores.presentation !== null
+      projectScores.creativity !== null &&
+      projectScores.scientificThought !== null &&
+      projectScores.technicalSkills !== null &&
+      projectScores.presentation !== null
     )
   }
 
@@ -313,10 +316,10 @@ export default function JudgePanel() {
 
   if (initialLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50">
         <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Loading judge panel...</p>
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#9B5A44]" />
+          <p className="text-[#9B5A44]">Loading judge panel...</p>
         </div>
       </div>
     )
@@ -324,11 +327,14 @@ export default function JudgePanel() {
 
   if (!user || !className || !projectId) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50">
         <Card className="w-full max-w-md">
           <CardContent className="text-center py-8">
             <p className="text-red-600 mb-4">Invalid access. Missing required parameters.</p>
-            <Button onClick={() => router.push("/judge-dashboard")}>
+            <Button
+              onClick={() => router.push("/judge-dashboard")}
+              className="bg-gradient-to-r from-[#9B5A44] to-[#D99058] hover:from-[#8B4A34] hover:to-[#C98048] text-white"
+            >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Dashboard
             </Button>
@@ -338,16 +344,21 @@ export default function JudgePanel() {
     )
   }
 
-  const isAbsent = projectCriteriaScores?.status === "Absent"
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-50">
       {/* Header */}
       <header className="bg-white shadow-lg border-b-4 border-[#F5BD3A]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
-            <div className="flex items-center">
-              <Button
+            <div className="flex items-center space-x-4">
+              <Image
+                src="/sf-logo.png"
+                alt="Science Fest Logo"
+                width={48}
+                height={48}
+                className="rounded-lg"
+              />
+               <Button
                 variant="ghost"
                 onClick={() => router.push("/judge-dashboard")}
                 className="mr-4 text-[#9B5A44] hover:bg-[#9B5A44] hover:text-white"
@@ -365,12 +376,12 @@ export default function JudgePanel() {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <Badge variant="outline" className="text-blue-600">
+              <Badge variant="outline" className="text-[#9B5A44] border-[#9B5A44]">
                 <Users className="mr-1 h-3 w-3" />
                 {students.length} Students
               </Badge>
               {hasUnsavedChanges && (
-                <Badge variant="outline" className="text-orange-600">
+                <Badge variant="outline" className="text-orange-600 border-orange-600">
                   Unsaved Changes
                 </Badge>
               )}
@@ -386,32 +397,11 @@ export default function JudgePanel() {
                 variant="outline"
                 onClick={handleNextProject}
                 disabled={currentProjectIndex >= allProjects.length - 1}
-                className="border-[#9B5A44] text-[#9B5A44] hover:bg-[#9B5A44] hover:text-white"
+                className="border-[#9B5A44] text-[#9B5A44] hover:bg-[#9B5A44] hover:text-white bg-transparent"
               >
                 Next Project
               </Button>
-              <Button
-                onClick={handleSaveScores}
-                disabled={saving || !isFormValid() || scoresSaved}
-                className="bg-gradient-to-r from-[#9B5A44] to-[#D99058] hover:from-[#8B4A34] hover:to-[#C98048] text-white"
-              >
-                {scoresSaved ? (
-                  <>
-                    <CheckCircle className="mr-2 h-4 w-4" />
-                    Scores Saved ✓
-                  </>
-                ) : saving ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Appending...
-                  </>
-                ) : (
-                  <>
-                    <Save className="mr-2 h-4 w-4" />
-                    Append Scores
-                  </>
-                )}
-              </Button>
+              
             </div>
           </div>
         </div>
@@ -421,20 +411,17 @@ export default function JudgePanel() {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-6">
           {/* Project Info */}
-          <Card>
+          <Card className="shadow-lg border-2 border-[#9B5A44]/20">
             <CardHeader className="bg-gradient-to-r from-[#9B5A44] to-[#D99058] text-white rounded-t-lg">
               <CardTitle className="flex items-center">
                 <Star className="mr-2 h-5 w-5" />
                 Project {projectId} - {className}
               </CardTitle>
               {projectTheme && (
-                <CardDescription className="text-md font-medium text-white-700 mt-1">
-                  Theme: {projectTheme}
-                </CardDescription>
+                <CardDescription className="text-amber-100 font-medium">Theme: {projectTheme}</CardDescription>
               )}
-              <CardDescription className="text-white">
-                Enter scores for the project on the judging criteria. Scores will be saved to your personal Judge_
-                {user.username} sheet.
+              <CardDescription className="text-amber-100">
+                Score this project on the 4 criteria below. Individual student attendance is tracked separately.
               </CardDescription>
             </CardHeader>
           </Card>
@@ -465,23 +452,25 @@ export default function JudgePanel() {
 
           {/* Student List */}
           {loading ? (
-            <Card>
-              <CardContent className="flex items-center justify-center py-12">
+            <Card className="shadow-lg border-2 border-[#9B5A44]/20">
+              <CardContent className="flex items-center justify-center py-12 bg-white">
                 <div className="text-center">
-                  <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-blue-600" />
-                  <p className="text-lg font-medium text-gray-700 mb-2">Loading Students</p>
-                  <p className="text-sm text-gray-500">Fetching student data from BaseSheet...</p>
+                  <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-[#9B5A44]" />
+                  <p className="text-lg font-medium text-[#9B5A44] mb-2">Loading Students</p>
+                  <p className="text-sm text-[#9B5A44]/70">Fetching student data from BaseSheet...</p>
                 </div>
               </CardContent>
             </Card>
           ) : students.length > 0 ? (
             <>
-              <Card>
-                <CardHeader>
-                  <CardTitle>Student List</CardTitle>
-                  <CardDescription>These are the students associated with Project {projectId}.</CardDescription>
+              <Card className="shadow-lg border-2 border-[#9B5A44]/20">
+                <CardHeader className="bg-gradient-to-r from-[#9B5A44] to-[#D99058] text-white rounded-t-lg">
+                  <CardTitle>Student Attendance</CardTitle>
+                  <CardDescription className="text-amber-100">
+                    Mark individual student attendance for Project {projectId}.
+                  </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-6 bg-white">
                   <div className="overflow-x-auto">
                     <Table>
                       <TableHeader>
@@ -502,11 +491,11 @@ export default function JudgePanel() {
                             <TableCell className="text-sm">{student.projectTitle}</TableCell>
                             <TableCell>
                               <Select
-                                value={projectCriteriaScores?.status || "Present"}
-                                onValueChange={handleStatusChange}
+                                value={studentStatuses[student.studentName] || "Present"}
+                                onValueChange={(value) => handleStatusChange(student.studentName, value)}
                                 disabled={scoresSaved}
                               >
-                                <SelectTrigger className="w-[100px]">
+                                <SelectTrigger className="w-[100px] border-[#9B5A44]/30 focus:border-[#F5BD3A] focus:ring-[#F5BD3A]">
                                   <SelectValue placeholder="Status" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -524,14 +513,14 @@ export default function JudgePanel() {
               </Card>
 
               {/* Theme Fit Card */}
-              <Card>
-                <CardHeader>
+              <Card className="shadow-lg border-2 border-[#9B5A44]/20">
+                <CardHeader className="bg-gradient-to-r from-[#9B5A44] to-[#D99058] text-white rounded-t-lg">
                   <CardTitle>Theme Fit</CardTitle>
-                  <CardDescription>How well does the project fit the theme?</CardDescription>
+                  <CardDescription className="text-amber-100">How well does the project fit the theme?</CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="p-6 bg-white">
                   <RadioGroup
-                    value={projectCriteriaScores?.themeFit || ""}
+                    value={projectScores.themeFit || ""}
                     onValueChange={handleThemeFitChange}
                     disabled={scoresSaved}
                     className="flex flex-col space-y-2"
@@ -571,80 +560,90 @@ export default function JudgePanel() {
               </Card>
 
               {/* Project Scoring Criteria Card */}
-              <Card>
-                <CardHeader>
+              <Card className="shadow-lg border-2 border-[#9B5A44]/20">
+                <CardHeader className="bg-gradient-to-r from-[#9B5A44] to-[#D99058] text-white rounded-t-lg">
                   <CardTitle>Project Scoring Criteria</CardTitle>
-                  <CardDescription>
-                    Enter scores (0-10) for each criterion. All fields are required unless the project is marked absent.
+                  <CardDescription className="text-amber-100">
+                    Enter scores (0-10) for the project on each criterion. These scores apply to the entire project.
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 gap-4">
+                <CardContent className="p-6 bg-white">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <Label htmlFor="creativity">Creativity & Imagination</Label>
+                      <Label htmlFor="creativity" className="text-[#9B5A44] font-medium">
+                        Creativity & Imagination
+                      </Label>
                       <Input
                         id="creativity"
                         type="number"
                         min="0"
                         max="10"
                         step="0.1"
-                        value={isAbsent ? "0" : projectCriteriaScores?.creativity?.toString() || ""}
+                        value={projectScores.creativity?.toString() || ""}
                         onChange={(e) => handleScoreChange("creativity", e.target.value)}
                         placeholder="0-10"
-                        disabled={scoresSaved || isAbsent}
+                        disabled={scoresSaved}
+                        className="border-[#9B5A44]/30 focus:border-[#F5BD3A] focus:ring-[#F5BD3A]"
                       />
-                      <p className="text-sm text-muted-foreground">
-                        Uniqueness of idea, originality, innovative approach.
-                      </p>
+                      <p className="text-sm text-[#9B5A44]/70">Uniqueness of idea, originality, innovative approach.</p>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="scientificThought">Scientific Thought / Principle / Approach</Label>
+                      <Label htmlFor="scientificThought" className="text-[#9B5A44] font-medium">
+                        Scientific Thought / Principle / Approach
+                      </Label>
                       <Input
                         id="scientificThought"
                         type="number"
                         min="0"
                         max="10"
                         step="0.1"
-                        value={isAbsent ? "0" : projectCriteriaScores?.scientificThought?.toString() || ""}
+                        value={projectScores.scientificThought?.toString() || ""}
                         onChange={(e) => handleScoreChange("scientificThought", e.target.value)}
                         placeholder="0-10"
-                        disabled={scoresSaved || isAbsent}
+                        disabled={scoresSaved}
+                        className="border-[#9B5A44]/30 focus:border-[#F5BD3A] focus:ring-[#F5BD3A]"
                       />
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-[#9B5A44]/70">
                         Clarity of scientific method, logical reasoning, understanding of concepts.
                       </p>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="technicalSkills">Technical Skills / Workmanship / Craftsmanship</Label>
+                      <Label htmlFor="technicalSkills" className="text-[#9B5A44] font-medium">
+                        Technical Skills / Workmanship / Craftsmanship
+                      </Label>
                       <Input
                         id="technicalSkills"
                         type="number"
                         min="0"
                         max="10"
                         step="0.1"
-                        value={isAbsent ? "0" : projectCriteriaScores?.technicalSkills?.toString() || ""}
+                        value={projectScores.technicalSkills?.toString() || ""}
                         onChange={(e) => handleScoreChange("technicalSkills", e.target.value)}
                         placeholder="0-10"
-                        disabled={scoresSaved || isAbsent}
+                        disabled={scoresSaved}
+                        className="border-[#9B5A44]/30 focus:border-[#F5BD3A] focus:ring-[#F5BD3A]"
                       />
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-[#9B5A44]/70">
                         Quality of construction, execution of experiments, data analysis skills.
                       </p>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="presentation">Presentation</Label>
+                      <Label htmlFor="presentation" className="text-[#9B5A44] font-medium">
+                        Presentation
+                      </Label>
                       <Input
                         id="presentation"
                         type="number"
                         min="0"
                         max="10"
                         step="0.1"
-                        value={isAbsent ? "0" : projectCriteriaScores?.presentation?.toString() || ""}
+                        value={projectScores.presentation?.toString() || ""}
                         onChange={(e) => handleScoreChange("presentation", e.target.value)}
                         placeholder="0-10"
-                        disabled={scoresSaved || isAbsent}
+                        disabled={scoresSaved}
+                        className="border-[#9B5A44]/30 focus:border-[#F5BD3A] focus:ring-[#F5BD3A]"
                       />
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-sm text-[#9B5A44]/70">
                         Clarity of explanation, visual appeal of display, ability to answer questions.
                       </p>
                     </div>
@@ -653,7 +652,7 @@ export default function JudgePanel() {
               </Card>
 
               <div className="mt-6 flex items-center justify-between">
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-[#9B5A44]/70">
                   {scoresSaved ? (
                     <span className="text-blue-600 flex items-center">
                       <CheckCircle className="mr-1 h-4 w-4" />
@@ -670,7 +669,7 @@ export default function JudgePanel() {
                 </div>
                 <Button
                   onClick={handleSaveScores}
-                  disabled={saving || !isFormValid() || scoresSaved} // Disable if already saved
+                  disabled={saving || !isFormValid() || scoresSaved}
                   size="lg"
                   className="bg-gradient-to-r from-[#9B5A44] to-[#D99058] hover:from-[#8B4A34] hover:to-[#C98048] text-white"
                 >
@@ -694,11 +693,11 @@ export default function JudgePanel() {
               </div>
             </>
           ) : (
-            <Card>
-              <CardContent className="text-center py-12">
-                <Users className="h-16 w-16 mx-auto mb-4 text-gray-300" />
-                <p className="text-lg font-medium mb-2">No students found</p>
-                <p className="text-sm text-gray-500">
+            <Card className="shadow-lg border-2 border-[#9B5A44]/20">
+              <CardContent className="text-center py-12 bg-white">
+                <Users className="h-16 w-16 mx-auto mb-4 text-[#9B5A44]/30" />
+                <p className="text-lg font-medium mb-2 text-[#9B5A44]">No students found</p>
+                <p className="text-sm text-[#9B5A44]/70">
                   No students found for Project {projectId} in {className}
                 </p>
               </CardContent>
