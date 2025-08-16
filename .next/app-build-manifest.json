@@ -1,14 +1,9 @@
 {
   "pages": {
-    "/judge-panel/page": [
+    "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/judge-panel/page.js"
-    ],
-    "/judge-panel/loading": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/judge-panel/loading.js"
+      "static/chunks/app/page.js"
     ],
     "/layout": [
       "static/chunks/webpack.js",
@@ -21,15 +16,15 @@
       "static/chunks/main-app.js",
       "static/chunks/app/judge-dashboard/page.js"
     ],
-    "/judge-scores/page": [
+    "/judge-panel/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/judge-scores/page.js"
+      "static/chunks/app/judge-panel/page.js"
     ],
-    "/page": [
+    "/judge-panel/loading": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
+      "static/chunks/app/judge-panel/loading.js"
     ],
     "/admin-dashboard/page": [
       "static/chunks/webpack.js",

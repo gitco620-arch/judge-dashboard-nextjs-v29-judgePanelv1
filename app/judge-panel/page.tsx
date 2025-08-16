@@ -293,6 +293,21 @@ export default function JudgePanel() {
       }
     }
 
+    setProjectScores({
+    creativity: null,
+    scientificThought: null,
+    technicalSkills: null,
+    presentation: null,
+    themeFit: null,
+  });
+  
+  setStudentStatuses({});
+  setScoresSaved(false);
+  setHasUnsavedChanges(false);
+  setSuccess("");
+  setError("");
+
+
     const nextIndex = currentProjectIndex + 1
     if (nextIndex < allProjects.length) {
       const nextProjectId = allProjects[nextIndex]
