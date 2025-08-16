@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
-import { GoogleSheetsService, SPREADSHEET_CONFIG } from "@/lib/google-sheets";
+import { googleSheetsService } from "@/lib/google-sheets";
+import { SPREADSHEET_CONFIG } from "@/lib/spreadsheet-config"; // Adjust the path as needed
 
 export async function GET() {
   try {
-    const sheetsService = new GoogleSheetsService();
+    const sheetsService =  googleSheetsService;
     const adminMasterSheetId = SPREADSHEET_CONFIG.ADMIN_MASTER.id;
     const summarySheetName = "Summary";
     const summaryRange = `${summarySheetName}!A:H`; // Standard, Rank, Project ID, Project Title, Theme, Project Average Score

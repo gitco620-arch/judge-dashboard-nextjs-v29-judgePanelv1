@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { GoogleSheetsService } from "@/lib/google-sheets"
+import { googleSheetsService } from "@/lib/google-sheets"
 
 export async function POST(request: Request) {
   console.log("API /api/auth called");
@@ -10,7 +10,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "Username and password are required" }, { status: 400 })
     }
 
-    const sheetsService = new GoogleSheetsService()
+    const sheetsService = googleSheetsService
     const credentials = await sheetsService.getCredentials()
 
     const user = credentials.find((cred) => cred.username === username && cred.password === password)

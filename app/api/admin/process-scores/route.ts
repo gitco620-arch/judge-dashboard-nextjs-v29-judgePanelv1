@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
-import { GoogleSheetsService, SPREADSHEET_CONFIG } from "@/lib/google-sheets";
+import { googleSheetsService } from "@/lib/google-sheets";
+import { SPREADSHEET_CONFIG } from "@/lib/spreadsheet-config"; // Adjust the path as needed
+
 import { type TopProjectSummary } from "@/app/admin-dashboard/page";
 
 export async function POST(request: Request) {
   try {
-    const sheetsService = new GoogleSheetsService();
+    const sheetsService = googleSheetsService;
     const classes = Object.keys(SPREADSHEET_CONFIG.CLASSES);
     const allTopProjects: TopProjectSummary[] = [];
 

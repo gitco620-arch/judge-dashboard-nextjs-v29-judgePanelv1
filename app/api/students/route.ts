@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { GoogleSheetsService } from "@/lib/google-sheets"
+import { googleSheetsService } from "@/lib/google-sheets"
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Initialize Google Sheets service
-    const sheetsService = new GoogleSheetsService()
+    const sheetsService = googleSheetsService
 
     try {
       const students = await sheetsService.getStudentsByProjectId(className, projectId)

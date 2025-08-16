@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { GoogleSheetsService } from "@/lib/google-sheets"
+import { googleSheetsService } from "@/lib/google-sheets"
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,16 +16,20 @@ export async function GET(request: NextRequest) {
     }
 
     // Initialize Google Sheets service
-    const sheetsService = new GoogleSheetsService()
+    const sheetsService = googleSheetsService
 
     try {
       // Fetch existing scores from judge sheet
-      const scores = await sheetsService.getJudgeScores(className, judgeName, projectId === "all" ? undefined : projectId)
+      const scores = await sheetsService.getJudgeScores(
+        className,
+        judgeName,
+        projectId === "all" ? undefined : (projectId ?? undefined)
+      )
 
-      // Assuming Theme Fit is in column K (index 10)
+      // Access themeFit property directly from JudgeScore object
       const scoresWithThemeFit = scores.map(row => ({
         ...row,
-        themeFit: row[10] || null,
+        themeFit: row.themeFit ?? null,
       }))
 
       return NextResponse.json({
@@ -68,7 +72,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Initialize Google Sheets service
-    const sheetsService = new GoogleSheetsService()
+    const sheetsService = googleSheetsService
 
     try {
       // Save scores to judge sheet (append mode)

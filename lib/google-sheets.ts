@@ -4,6 +4,9 @@ import * as fs from "fs"
 import * as path from "path"
 import * as os from "os"
 
+// Import or define SPREADSHEET_CONFIG
+import { SPREADSHEET_CONFIG } from "./spreadsheet-config"; // Adjust the path as needed
+
 const CLASS_SHEET_IDS_PATH = path.resolve(process.cwd(), "lib/class-sheet-ids.json")
 
 function loadClassSheetIds(): Record<string, string> {
@@ -19,10 +22,24 @@ function saveClassSheetIds(ids: Record<string, string>) {
   fs.writeFileSync(CLASS_SHEET_IDS_PATH, JSON.stringify(ids, null, 2), "utf-8")
 }
 
+
+// Types
+interface ClassConfig {
+  id: string;
+  baseSheet: string;
+  range: string;
+}
+
 export interface SheetCredential {
   username: string
   password: string
   role: string
+}
+
+export interface SheetData {
+  values: string[][];
+  range: string;
+  spreadsheetId: string;
 }
 
 export interface StudentProject {
@@ -31,7 +48,7 @@ export interface StudentProject {
   grade: string
   projectTitle: string
   projectId: string
-  theme?: string // Added theme field
+  theme?: string
 }
 
 export interface JudgeScore {
@@ -44,87 +61,17 @@ export interface JudgeScore {
   scientificThought: number | null
   technicalSkills: number | null
   presentation: number | null
-  status?: string // Added status field (e.g., "Present", "Absent")
-  themeFit?: string | null // Added themeFit field
+  status?: string
+  themeFit?: string | null
 }
 
-export interface SheetData {
-  values: string[][]
-  range: string
-  spreadsheetId: string
-}
+// Cache mechanism
+// Removed duplicate declaration of sheetTitlesCache
 
-interface ClassConfig {
-  id: string
-  baseSheet: string
-  range: string
-}
+// Singleton service instance
+let sheetsServiceInstance: GoogleSheetsService | null = null;
 
-// Configuration for Google Sheets API
-export const GOOGLE_SHEETS_CONFIG = {
-  scopes: ["https://www.googleapis.com/auth/spreadsheets"],
-}
-
-// Spreadsheet configurations - changed to 'let' to allow dynamic updates for demonstration
-const persistedIds = loadClassSheetIds()
-export let SPREADSHEET_CONFIG = {
-  CREDENTIALS: {
-    id: process.env.CREDENTIALS_SPREADSHEET_ID || "1juP3Eg24GYgOmFcxpNMfbUSXK4m7xTqzlN-Cw9ndYQc", // REPLACE WITH YOUR CREDENTIALS SHEET ID
-    range: "Sheet1!A:C", // Username, Password, Role
-  },
-  ADMIN_MASTER: {
-    id: process.env.ADMIN_MASTER_SPREADSHEET_ID || "1snk-FZaxyZbSu_Ww-oPnam8JxZ2RLg3etI5TBkr-T1A", // New: Admin Master Sheet ID, defaults to credentials sheet
-  },
-  CLASSES: {
-    "Class 4": {
-      id: persistedIds["Class 4"], // REPLACE
-      baseSheet: "BaseSheet",
-      range: "Sheet1!A:F", // Updated range to include Theme (assuming column F)
-    },
-    "Class 5": {
-      id: persistedIds["Class 5"], // REPLACE
-      baseSheet: "BaseSheet",
-      range: "Sheet1!A:F", // Updated range to include Theme (assuming column F)
-    },
-    "Class 6": {
-      id: persistedIds["Class 6"], // REPLACE
-      baseSheet: "BaseSheet",
-      range: "Sheet1!A:F", // Updated range to include Theme (assuming column F)
-    },
-    "Class 7": {
-      id: persistedIds["Class 7"], // REPLACE
-      baseSheet: "BaseSheet",
-      range: "Sheet1!A:F", // Updated range to include Theme (assuming column F)
-    },
-    "Class 8": {
-      id: persistedIds["Class 8"], // REPLACE
-      baseSheet: "BaseSheet",
-      range: "Sheet1!A:F", // Updated range to include Theme (assuming column F)
-    },
-    "Class 9": {
-      id: persistedIds["Class 9"], // REPLACE
-      baseSheet: "BaseSheet",
-      range: "Sheet1!A:F", // Updated range to include Theme (assuming column F)
-    },
-    "Class 10": {
-      id: persistedIds["Class 10"], // REPLACE
-      baseSheet: "BaseSheet",
-      range: "Sheet1!A:F", // Updated range to include Theme (assuming column F)
-    },
-    "Class 11": {
-      id: persistedIds["Class 11"], // REPLACE
-      baseSheet: "BaseSheet",
-      range: "Sheet1!A:F", // Updated range to include Theme (assuming column F)
-    },
-    "Class 12": {
-      id: persistedIds["Class 12"], // REPLACE
-      baseSheet: "BaseSheet",
-      range: "Sheet1!A:F", // Updated range to include Theme (assuming column F)
-    },
-  },
-}
-
-export class GoogleSheetsService {
+class GoogleSheetsService {
   private auth: GoogleAuth
   private sheets: any
 
@@ -132,11 +79,8 @@ export class GoogleSheetsService {
     try {
       const base64Key = process.env.GOOGLE_SERVICE_ACCOUNT_KEY_BASE64;
       if (!base64Key) {
-        throw new Error(
-          "GOOGLE_SERVICE_ACCOUNT_KEY_BASE64 environment variable is not set. Please configure your service account key as a Base64 encoded string."
-        );
+        throw new Error("GOOGLE_SERVICE_ACCOUNT_KEY_BASE64 environment variable is not set.");
       }
-      // Decode and write to a temp file in the OS temp directory
       const keyData = Buffer.from(base64Key, "base64").toString("utf8");
       const tmpDir = os.tmpdir();
       const keyPath = path.join(tmpDir, "service-account-key.json");
@@ -144,10 +88,9 @@ export class GoogleSheetsService {
 
       this.auth = new GoogleAuth({
         keyFile: keyPath,
-        scopes: GOOGLE_SHEETS_CONFIG.scopes,
+        scopes: ["https://www.googleapis.com/auth/spreadsheets"],
       });
       this.sheets = google.sheets({ version: "v4", auth: this.auth });
-      console.log("🔗 Google Sheets API initialized with service account key from Base64.");
     } catch (err) {
       console.error("❌ Error initializing Google Sheets API:", err);
       throw err;
@@ -920,26 +863,11 @@ export class GoogleSheetsService {
 
   // New function to update a class's spreadsheet ID
   updateClassSpreadsheetId(className: string, newId: string): void {
-    if (SPREADSHEET_CONFIG.CLASSES[className as keyof typeof SPREADSHEET_CONFIG.CLASSES]) {
-      // Update in-memory config
-      SPREADSHEET_CONFIG = {
-        ...SPREADSHEET_CONFIG,
-        CLASSES: {
-          ...SPREADSHEET_CONFIG.CLASSES,
-          [className]: {
-            ...SPREADSHEET_CONFIG.CLASSES[className as keyof typeof SPREADSHEET_CONFIG.CLASSES],
-            id: newId,
-          },
-        },
-      }
-      // Persist to file
-      const ids = loadClassSheetIds()
-      ids[className] = newId
-      saveClassSheetIds(ids)
-      console.log(`[Backend Simulation] Updated SPREADSHEET_CONFIG for ${className} to ID: ${newId} and persisted to file`)
-    } else {
-      console.warn(`[Backend Simulation] Class ${className} not found in SPREADSHEET_CONFIG.`)
-    }
+    // Persist to file only, do not attempt to mutate imported config
+    const ids = loadClassSheetIds();
+    ids[className] = newId;
+    saveClassSheetIds(ids);
+    console.log(`[Backend Simulation] Updated classSheetIds for ${className} to ID: ${newId} and persisted to file`);
   }
 }
 
@@ -955,4 +883,53 @@ async function getAllSheetTitlesCached(spreadsheetId: string): Promise<string[]>
   const titles = await googleSheetsService.getAllSheetTitles(spreadsheetId);
   sheetTitlesCache[spreadsheetId] = titles;
   return titles;
+}
+
+// Helper to get/create service instance
+function getService(): GoogleSheetsService {
+  if (!sheetsServiceInstance) {
+    sheetsServiceInstance = new GoogleSheetsService();
+  }
+  return sheetsServiceInstance;
+}
+
+// Exported async functions that use the service
+export async function getCredentials(): Promise<SheetCredential[]> {
+  const service = getService();
+  return service.getCredentials();
+}
+
+export async function getProjectIds(className: string): Promise<string[]> {
+  const service = getService();
+  return service.getProjectIds(className);
+}
+
+export async function getStudentsByProjectId(className: string, projectId: string): Promise<StudentProject[]> {
+  const service = getService();
+  return service.getStudentsByProjectId(className, projectId);
+}
+
+export async function getJudgeScores(className: string, judgeName: string, projectId?: string): Promise<JudgeScore[]> {
+  const service = getService();
+  return service.getJudgeScores(className, judgeName, projectId);
+}
+
+export async function saveJudgeScores(className: string, judgeName: string, scores: JudgeScore[]): Promise<void> {
+  const service = getService();
+  return service.saveJudgeScores(className, judgeName, scores);
+}
+
+export async function processClassScores(className: string): Promise<void> {
+  const service = getService();
+  return service.processClassScores(className);
+}
+
+export async function getTopProjects(className: string): Promise<any[]> {
+  const service = getService();
+  return service.getTopProjects(className);
+}
+
+export async function updateAdminSummary(summaryData: any[]): Promise<void> {
+  const service = getService();
+  return service.updateAdminSummary(summaryData);
 }
