@@ -125,7 +125,13 @@ export default function AdminDashboard() {
       }
 
       // Fetch top projects summary
-      const summaryResponse = await fetch("/api/admin/summary")
+      const summaryResponse = await fetch("/api/admin/summary", {
+        cache: "no-store",
+        headers: {
+          Pragma: "no-cache",
+          "Cache-Control": "no-cache",
+        },
+      })
       const summaryData = await summaryResponse.json()
       if (summaryData.success) {
         setTopProjectsSummary(summaryData.summary)
