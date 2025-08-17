@@ -1,4 +1,7 @@
 {
+  "/page": "app/page.js",
+  "/admin-dashboard/page": "app/admin-dashboard/page.js",
   "/api/admin/class-sheet-ids/route": "app/api/admin/class-sheet-ids/route.js",
+  "/api/admin/process-scores/route": "app/api/admin/process-scores/route.js",
   "/api/admin/summary/route": "app/api/admin/summary/route.js"
 }

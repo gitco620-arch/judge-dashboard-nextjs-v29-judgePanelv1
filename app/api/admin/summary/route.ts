@@ -32,7 +32,7 @@ export async function GET() {
       projectTitle: row[3] || '',
       theme: row[4] || '',
       projectAvgScore: Number.parseFloat(row[5]) || 0,
-      studentNames: row[7] || '', // Fixed: Changed to index 7 for studentNames
+      studentNames: row[6] || '', // Fixed: Changed to index 7 for studentNames
     }));
 
     return NextResponse.json({
