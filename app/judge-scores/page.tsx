@@ -34,7 +34,7 @@ export default function JudgeScoresPage() {
   const [lastUpdated, setLastUpdated] = useState<string>("")
   const router = useRouter()
 
-  const classes = ["Class 4", "Class 5", "Class 6", "Class 7", "Class 8", "Class 9", "Class 10", "Class 11", "Class 12"]
+  const classes = ["Class 4", "Class 5", "Class 6", "Class 7", "Class 8", "Class 9", "Class 10"]
 
   useEffect(() => {
     const userData = localStorage.getItem("user")

@@ -773,7 +773,7 @@ class GoogleSheetsService {
 
       for (let i = 0; i < projects.length; i++) {
         const project = projects[i]
-        if (projectsAdded < 3) {
+        if (projectsAdded < 5) {
           topProjects.push({ ...project, standard: className, rank: currentRank })
           projectsAdded++
         } else if (project.projectAvgScore === topProjects[topProjects.length - 1].projectAvgScore) {

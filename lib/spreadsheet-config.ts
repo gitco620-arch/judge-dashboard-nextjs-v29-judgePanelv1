@@ -3,12 +3,10 @@ const persistedIds: { [key: string]: string } = {
   "Class 4": "1E3TH6Z-LFCUxkG3zLeS_lQqyaTaaHfox-keZoiDudKw",
   "Class 5": "1k20S_yaFPXNPcZoWIBx60ePJpMx2LfLRj8TQTdoHXms",
   "Class 7": "1wyPgb9eOjOLaVQAJl11AlZAXow3H--j_AWjsSTIAwiA",
-  "Class 11": "1NlCkOtJf445H-JuZWDp12i8m61FKQxSJAdnt2-2_r-A",
   "Class 6": "1TmkP-nLF40wbfi5hfiWt7eXkW3PE9EnuvojhlU7ooBM",
   "Class 8": "15KvL4WVwlv9wEs_TFJML1ZVfCpbli5iLhyM6EXWNbLw",
   "Class 9": "1SsEAJvXthHQ4UYP9LuPoRBaagPoWquuPtyqOUR-LFME",
-  "Class 10": "1iBXGlafBNIp1T_EQitrqDBJU4ELzN1TzlabHD2Z4u7Y",
-  "Class 12": "1ikZZeEVGKB12noeHCoaTUoYlq6O4s415Lu940N55A2M"
+  "Class 10": "1iBXGlafBNIp1T_EQitrqDBJU4ELzN1TzlabHD2Z4u7Y"
 };
 
 export const SPREADSHEET_CONFIG = {
@@ -52,16 +50,6 @@ export const SPREADSHEET_CONFIG = {
     },
     "Class 10": {
       id: persistedIds["Class 10"], // REPLACE
-      baseSheet: "BaseSheet",
-      range: "Sheet1!A:F", // Updated range to include Theme (assuming column F)
-    },
-    "Class 11": {
-      id: persistedIds["Class 11"], // REPLACE
-      baseSheet: "BaseSheet",
-      range: "Sheet1!A:F", // Updated range to include Theme (assuming column F)
-    },
-    "Class 12": {
-      id: persistedIds["Class 12"], // REPLACE
       baseSheet: "BaseSheet",
       range: "Sheet1!A:F", // Updated range to include Theme (assuming column F)
     },
