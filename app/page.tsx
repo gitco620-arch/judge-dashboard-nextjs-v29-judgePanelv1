@@ -82,7 +82,7 @@ export default function LoginPage() {
           <div>
             <h1 className="text-3xl font-bold text-[#9B5A44] tracking-wide">SHAANTHI SCHOOL</h1>
             <div className="mt-2 p-3 bg-gradient-to-r from-[#F5BD3A] to-[#D99058] rounded-lg shadow-md">
-              <p className="text-white font-semibold text-lg">AURA V - The Way to Shine in KREA</p>
+              <p className="text-white font-semibold text-lg">KREA 2025-26</p>
             </div>
           </div>
         </div>
