@@ -172,7 +172,7 @@ export default function JudgeDashboard() {
               />
               <div>
                 <h1 className="text-2xl font-bold text-[#9B5A44]">Judge Dashboard</h1>
-                <p className="text-sm text-[#D99058] font-medium">AURA V - The Way to Shine in KREA</p>
+                <p className="text-sm text-[#D99058] font-medium">KREA 2025-26</p>
                 <p className="text-xs text-[#9B5A44]/70">Welcome, Judge {user.username}</p>
               </div>
             </div>
