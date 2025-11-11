@@ -275,7 +275,7 @@ export default function AdminDashboard() {
               <Settings className="h-6 w-6 text-[#9B5A44] mr-3" />
               <div>
                 <h1 className="text-2xl font-bold text-[#9B5A44]">Admin Dashboard</h1>
-                <p className="text-sm text-[#D99058] font-medium">AURA V - The Way to Shine in KREA</p>
+                <p className="text-sm text-[#D99058] font-medium">KREA 2025-26</p>
                 <p className="text-xs text-[#9B5A44]/70">Welcome, Admin {user.username}</p>
               </div>
             </div>
