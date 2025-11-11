@@ -383,7 +383,7 @@ export default function JudgePanel() {
               </Button>
               <div>
                 <h1 className="text-xl font-semibold text-[#9B5A44]">Judge Panel</h1>
-                <p className="text-sm text-[#D99058] font-medium">AURA V - The Way to Shine in KREA</p>
+                <p className="text-sm text-[#D99058] font-medium">KREA 2025-26</p>
                 <p className="text-xs text-[#9B5A44]/70">
                   {className} - Project {projectId} ({currentProjectIndex + 1} of {allProjects.length}) - Judge:{" "}
                   {user.username}
